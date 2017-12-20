@@ -9,8 +9,8 @@ $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -RunLevel Highest
 Register-ScheduledTask -Action $action -Trigger $trigger -Principal $principal -TaskName "sfm_deploy" -Description "Deploy Sophos SFM" 
 
 # Check if Hyper-V is installed, if not install Hyper-V and management tools
-$hypervCheck = Get-WindowsFeature -name Hyper-V
+$hypervCheck = Get-WindowsFeature -name Hyper-V -ErrorAction SilentlyContinue
 
 if ($hypervCheck.Installed -eq 'False') {
-Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart -ErrorAction SilentlyContinue
 }
