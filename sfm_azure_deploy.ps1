@@ -1,7 +1,7 @@
 # Check if Hyper-V is installed, if not install Hyper-V and management tools
 $hypervCheck = Get-WindowsFeature -name Hyper-V -ErrorAction SilentlyContinue
 
-if ($hypervCheck.Installed -eq 'False') {
+if ($hypervCheck.Installed -ne 'True') {
 Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart -ErrorAction SilentlyContinue
 }
 
