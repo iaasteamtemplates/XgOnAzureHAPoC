@@ -29,6 +29,8 @@ Add-NetNatStaticMapping -NatName "SfmNATnetwork" -Protocol TCP -ExternalIPAddres
 Add-NetNatStaticMapping -NatName "SfmNATnetwork" -Protocol TCP -ExternalIPAddress 0.0.0.0 -InternalIPAddress 192.168.2.1 -InternalPort 4422 -ExternalPort 4422
 Add-NetNatStaticMapping -NatName "SfmNATnetwork" -Protocol TCP -ExternalIPAddress 0.0.0.0 -InternalIPAddress 192.168.2.1 -InternalPort 22 -ExternalPort 22
 Add-NetNatStaticMapping -NatName "SfmNATnetwork" -Protocol TCP -ExternalIPAddress 0.0.0.0 -InternalIPAddress 192.168.2.1 -InternalPort 514 -ExternalPort 514
+Add-NetNatStaticMapping -NatName "SfmNATnetwork" -Protocol TCP -ExternalIPAddress 0.0.0.0 -InternalIPAddress 192.168.2.1 -InternalPort 6514 -ExternalPort 6514
+Add-NetNatStaticMapping -NatName "SfmNATnetwork" -Protocol TCP -ExternalIPAddress 0.0.0.0 -InternalIPAddress 192.168.2.1 -InternalPort 8443 -ExternalPort 8443
  
 # This example creates a mapping between port 82 of the Virtual Machine host to port 80 of a Virtual Machine with an IP address of 172.16.16.16.
 # Add-NetNatStaticMapping -NatName "SfmNATnetwork" -Protocol TCP -ExternalIPAddress 0.0.0.0 -InternalIPAddress 172.16.16.16 -InternalPort 80 -ExternalPort 82
