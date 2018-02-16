@@ -60,6 +60,9 @@ New-Vm -Name $vm_name -MemoryStartupBytes 4GB -Generation 1 -VHDPath C:\VMs\sfm-
 Add-VMNetworkAdapter -VMName $vm_name -SwitchName "SfmNatSwitch"
 Add-VMHardDiskDrive -VMName $vm_name -Path "C:\VMs\sfm-aux.vhd"
 Start-Vm $vm_name
+Start-Vm $vm_name
+Start-Vm $vm_name
 Start-Sleep -Seconds 5
+Start-Vm $vm_name
  
 }
