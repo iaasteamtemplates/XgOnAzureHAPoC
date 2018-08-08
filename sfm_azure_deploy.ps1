@@ -57,6 +57,7 @@ $wc.DownloadFile($sfm_aux_uri, $sfm_aux_path)
  
 # Create Hyper-V VM and attach the disks
 New-Vm -Name $vm_name -MemoryStartupBytes 4GB -Generation 1 -VHDPath C:\VMs\sfm-pri.vhd
+Set-VMProcessor $vm_name -Count 2
 Add-VMNetworkAdapter -VMName $vm_name -SwitchName "SfmNatSwitch"
 Add-VMHardDiskDrive -VMName $vm_name -Path "C:\VMs\sfm-aux.vhd"
 Start-Vm $vm_name

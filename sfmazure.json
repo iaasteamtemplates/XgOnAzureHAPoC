@@ -2,6 +2,13 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+      "virtualMachineName": {
+        "type": "string",
+        "defaultValue": "sfm-azure-01",
+        "metadata": {
+          "description": "Name of the VM"
+        }
+      },
       "virtualMachineSize": {
         "type": "string",
         "defaultValue": "Standard_D2s_v3",
@@ -10,32 +17,55 @@
           "Standard_D4s_v3"
         ]
       },
-      "adminUsername": {
-        "type": "string"
-      },
       "adminPassword": {
         "type": "securestring"
       },
+      "vNetNewOrExisting": {
+        "type": "string",
+        "defaultValue": "new",
+        "allowedValues": [
+          "new",
+          "existing"
+        ],
+        "metadata": {
+          "description": "Specify whether to create a new or existing virtual network for the VM."
+        }
+      },
+      "virtualNetworkResourceGroup": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().name]",
+        "metadata": {
+          "description": "Name of the existing VNET resource group"
+        }
+      },
       "virtualNetworkName": {
-        "type": "string"
+        "type": "string",
+        "defaultValue": "sfm-vnet",
+        "metadata": {
+        "description": "Name of the new or existing VNET"
+        }
       },
       "virtualNetworkAddressPrefix": {
         "type": "string"
       },
       "subnetName": {
-        "type": "string"
+        "type": "string",
+        "defaultValue": "sfm-subnet-1",
+        "metadata": {
+        "description": "Name of the subnet in the virtual network you want to use"
+      }
       },
       "subnetPrefix": {
         "type": "string"
       }
     },
     "variables": {
+      "adminUsername": "azureadmin",
       "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-      "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+      "subnetRef": "[resourceId(parameters('virtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),  parameters('subnetName'))]",
       "publicIpAddressSku": "Basic",
       "publicIpAddressName": "sfm-azure-01-pip",
       "publicIpAddressType": "Static",
-      "virtualMachineName": "sfm-azure-01",
       "networkInterfaceName": "sfm-azure-01-nic",
       "networkSecurityGroupName": "sfm-azure-01-nsg",
       "customscriptScriptFolder": "CustomScripts",
@@ -43,17 +73,17 @@
     },
     "resources": [
       {
-        "name": "[variables('virtualMachineName')]",
+        "apiVersion": "2018-04-01",
         "type": "Microsoft.Compute/virtualMachines",
-        "apiVersion": "2016-04-30-preview",
+        "name": "[parameters('virtualMachineName')]",
         "location": "[resourceGroup().location]",
         "dependsOn": [
           "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
         ],
         "properties": {
           "osProfile": {
-            "computerName": "[variables('virtualMachineName')]",
-            "adminUsername": "[parameters('adminUsername')]",
+            "computerName": "[parameters('virtualMachineName')]",
+            "adminUsername": "[variables('adminUsername')]",
             "adminPassword": "[parameters('adminPassword')]",
             "windowsConfiguration": {
               "provisionVmAgent": "true"
@@ -93,7 +123,7 @@
             "location": "[resourceGroup().location]",
             "apiVersion": "2016-03-30",
             "dependsOn": [
-              "[resourceId('Microsoft.Compute/virtualMachines', variables('virtualMachineName'))]"
+              "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
             ],
             "tags": {
               "displayName": "customscript"
@@ -114,9 +144,10 @@
         ]
       },
       {
-        "name": "[parameters('virtualNetworkName')]",
-        "type": "Microsoft.Network/virtualNetworks",
+        "condition": "[equals(parameters('vNetNewOrExisting'), 'new')]",
         "apiVersion": "2017-08-01",
+        "type": "Microsoft.Network/virtualNetworks",
+        "name": "[parameters('virtualNetworkName')]", 
         "location": "[resourceGroup().location]",
         "properties": {
           "addressSpace": {
@@ -242,7 +273,7 @@
     "outputs": {
       "adminUsername": {
         "type": "string",
-        "value": "[parameters('adminUsername')]"
+        "value": "[variables('adminUsername')]"
       }
     }
   }
