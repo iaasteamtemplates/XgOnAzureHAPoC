@@ -20,7 +20,7 @@
       "adminPassword": {
         "type": "securestring"
       },
-      "vNetNewOrExisting": {
+      "VnetAndSubnetNewOrExisting": {
         "type": "string",
         "defaultValue": "new",
         "allowedValues": [
@@ -31,28 +31,28 @@
           "description": "Specify whether to create a new or existing virtual network for the VM."
         }
       },
-      "virtualNetworkResourceGroup": {
+      "VnetResourceGroup": {
         "type": "string",
         "defaultValue": "[resourceGroup().name]",
         "metadata": {
           "description": "Name of the existing VNET resource group"
         }
       },
-      "virtualNetworkName": {
+      "VnetName": {
         "type": "string",
         "defaultValue": "sfm-vnet",
         "metadata": {
         "description": "Name of the new or existing VNET"
         }
       },
-      "virtualNetworkAddressPrefix": {
+      "VnetAddressPrefix": {
         "type": "string"
       },
       "subnetName": {
         "type": "string",
         "defaultValue": "sfm-subnet-1",
         "metadata": {
-        "description": "Name of the subnet in the virtual network you want to use"
+        "description": "Name of the subnet in the virtual network you want to use. An existing subnet is assumed if using an existing vNet"
       }
       },
       "subnetPrefix": {
@@ -61,13 +61,13 @@
     },
     "variables": {
       "adminUsername": "azureadmin",
-      "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-      "subnetRef": "[resourceId(parameters('virtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),  parameters('subnetName'))]",
+      "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('VnetName'))]",
+      "subnetRef": "[resourceId(parameters('VnetResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('VnetName'),  parameters('subnetName'))]",
       "publicIpAddressSku": "Basic",
-      "publicIpAddressName": "sfm-azure-01-pip",
       "publicIpAddressType": "Static",
-      "networkInterfaceName": "sfm-azure-01-nic",
-      "networkSecurityGroupName": "sfm-azure-01-nsg",
+      "publicIpAddressName": "[concat(parameters('virtualMachineName'), '-pip')]",
+      "networkInterfaceName": "[concat(parameters('virtualMachineName'), '-nic')]",
+      "networkSecurityGroupName": "[concat(parameters('virtualMachineName'), '-nsg')]",
       "customscriptScriptFolder": "CustomScripts",
       "customscriptScriptFileName": "customscript.ps1"
     },
@@ -144,15 +144,15 @@
         ]
       },
       {
-        "condition": "[equals(parameters('vNetNewOrExisting'), 'new')]",
+        "condition": "[equals(parameters('vNetandSubnetNewOrExisting'), 'new')]",
         "apiVersion": "2017-08-01",
         "type": "Microsoft.Network/virtualNetworks",
-        "name": "[parameters('virtualNetworkName')]", 
+        "name": "[parameters('VnetName')]", 
         "location": "[resourceGroup().location]",
         "properties": {
           "addressSpace": {
             "addressPrefixes": [
-              "[parameters('virtualNetworkAddressPrefix')]"
+              "[parameters('VnetAddressPrefix')]"
             ]
           },
           "subnets": [
@@ -171,7 +171,7 @@
         "apiVersion": "2016-09-01",
         "location": "[resourceGroup().location]",
         "dependsOn": [
-          "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+          "[concat('Microsoft.Network/virtualNetworks/', parameters('VnetName'))]",
           "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
           "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
         ],
